@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const tesseract = require("tesseract.js");
+const { createWorker } = require("tesseract.js");
 const cors = require("cors");
 
 const app = express();
@@ -45,9 +46,14 @@ app.post("/extract-text", async (req, res) => {
     const imagePath = path.join(__dirname, "images", filename);
 
     // Use Tesseract.js to extract text from the image
-    const {
-      data: { text },
-    } = await tesseract.recognize(imagePath);
+    // const {
+    //   data: { text },
+    // } = await tesseract.recognize(imagePath);
+
+    const worker = await createWorker("eng");
+    const ret = await worker.recognize(imagePath);
+    console.log(ret.data.text);
+    await worker.terminate();
 
     // Send the extracted text to the frontend
     res.json({ message: "Text extracted successfully!", text });

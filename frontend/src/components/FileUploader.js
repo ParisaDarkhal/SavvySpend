@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Dropzone from "react-dropzone";
 import axios from "axios";
+
 function FileUploader() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
@@ -82,7 +83,7 @@ function FileUploader() {
           filename: uploadedFilename,
         });
 
-        if (textExtractionResponse.ok) {
+        if (textExtractionResponse) {
           const extractedText = textExtractionResponse.data.text;
           // Display the extracted text in a separate box on your website
           // (update your component accordingly)
@@ -112,7 +113,13 @@ function FileUploader() {
         {({ getRootProps, getInputProps }) => (
           <div
             {...getRootProps()}
-            style={{ border: dragOver ? "2px dashed #ddd" : "none" }}
+            style={{
+              backgroundColor: dragOver ? "#eee" : "#fff",
+              padding: "40px",
+              margin: "20px 100px",
+              border: "2px dashed #ccc",
+              borderRadius: "5px",
+            }}
           >
             <input {...getInputProps()} />
             {dragOver ? (
