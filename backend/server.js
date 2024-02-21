@@ -5,8 +5,11 @@ const tesseract = require("tesseract.js");
 const { createWorker } = require("tesseract.js");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+require("dotenv").config();
+const OpenAI = require("openai");
 
 const app = express();
+const openai = new OpenAI(process.env.OPENAI_API_KEY);
 app.use(cors());
 app.use(bodyParser.json());
 const port = 3001;
