@@ -43,19 +43,14 @@ app.post("/upload", upload.single("receiptImage"), async (req, res) => {
 // Text extraction route
 app.post("/extract-text", async (req, res) => {
   try {
-    console.log("request :>> ", req);
     const { filename } = req.body;
 
     const imagePath = path.join(__dirname, "images", filename);
 
-    // Use Tesseract.js to extract text from the image
-    // const {
-    //   data: { text },
-    // } = await tesseract.recognize(imagePath);
-
     const worker = await createWorker("eng");
     const ret = await worker.recognize(imagePath);
-    console.log(ret.data.text);
+    const text = ret.data.text;
+    console.log(text);
     await worker.terminate();
 
     // Send the extracted text to the frontend

@@ -4,10 +4,12 @@ import axios from "axios";
 
 function FileUploader() {
   const [selectedFile, setSelectedFile] = useState(null);
-
   const [dragOver, setDragOver] = useState(false);
+  const [text, setText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // ... (other functions and event handlers)
+  // functions & event handlers
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
 
@@ -15,7 +17,7 @@ function FileUploader() {
       return alert("Please select a file");
     }
 
-    // Validate file type (optional)
+    // Validate file type
     const allowedTypes = ["image/jpeg", "image/png"];
     if (!allowedTypes.includes(selectedFile.type)) {
       return alert("Invalid file type. Please upload an image (JPEG or PNG)");
@@ -24,7 +26,7 @@ function FileUploader() {
     // Update state with the selected file
     setSelectedFile(selectedFile);
 
-    // Optionally, display the filename or size in your UI
+    // display the filename or size in UI
     console.log("Selected file:", selectedFile.name);
   };
 
@@ -40,7 +42,7 @@ function FileUploader() {
       return alert("Please select a file");
     }
 
-    // Validate file type (optional)
+    // Validate file type
     const allowedTypes = ["image/jpeg", "image/png"];
     if (!allowedTypes.includes(selectedFile.type)) {
       return alert("Invalid file type. Please upload an image (JPEG or PNG)");
@@ -49,7 +51,7 @@ function FileUploader() {
     // Update state with the selected file
     setSelectedFile(selectedFile);
 
-    // Optionally, display the filename or size in your UI
+    // display the filename or size in UI
     console.log("Dropped file:", selectedFile.name);
   };
 
@@ -58,7 +60,7 @@ function FileUploader() {
     setDragOver(false);
   };
 
-  // ... (check file, create FormData, send request)
+  // check file, create FormData, send request
   const handleSubmit = async () => {
     if (!selectedFile) {
       return alert("Please select a receipt image");
@@ -88,8 +90,8 @@ function FileUploader() {
 
         if (textExtractionResponse) {
           const extractedText = textExtractionResponse.data.text;
-          // Display the extracted text in a separate box on your website
-          // (update your component accordingly)
+          setText(extractedText);
+
           console.log("Extracted text:", extractedText);
         } else {
           console.error("Error extracting text:", textExtractionResponse.data);
@@ -134,6 +136,25 @@ function FileUploader() {
         )}
       </Dropzone>
       <button onClick={handleSubmit}>Upload Receipt</button>
+      <div className="ReceiptText">
+        <h3>Text Extracted</h3>
+        <div
+          style={{
+            backgroundColor: dragOver ? "#eee" : "#fff",
+            padding: "40px",
+            margin: "20px 100px",
+            border: "2px dashed #ccc",
+            borderRadius: "5px",
+          }}
+        >
+          {text && (
+            <div className="extracted-text-box">
+              <h2>Extracted Text</h2>
+              <p style={{ whiteSpace: "pre", textAlign: "left" }}>{text}</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
