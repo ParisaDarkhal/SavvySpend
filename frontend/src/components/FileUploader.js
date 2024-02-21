@@ -4,6 +4,7 @@ import axios from "axios";
 
 function FileUploader() {
   const [selectedFile, setSelectedFile] = useState(null);
+
   const [dragOver, setDragOver] = useState(false);
 
   // ... (other functions and event handlers)
@@ -65,6 +66,8 @@ function FileUploader() {
 
     const formData = new FormData();
     formData.append("receiptImage", selectedFile);
+    // Add the filename explicitly
+    formData.append("filename", selectedFile.name);
 
     try {
       const response = await axios.post("/upload", formData, {

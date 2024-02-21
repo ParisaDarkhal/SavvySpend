@@ -4,9 +4,11 @@ const path = require("path");
 const tesseract = require("tesseract.js");
 const { createWorker } = require("tesseract.js");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
 const port = 3001;
 
 // Configure Multer for file upload
@@ -31,7 +33,7 @@ app.post("/upload", upload.single("receiptImage"), async (req, res) => {
     console.log("File uploaded:", filename, filepath);
 
     // Send a success response to the frontend
-    res.json({ message: "Receipt uploaded successfully!" });
+    res.json({ message: "Receipt uploaded successfully!", filename: filename });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error uploading file" });
@@ -41,6 +43,7 @@ app.post("/upload", upload.single("receiptImage"), async (req, res) => {
 // Text extraction route
 app.post("/extract-text", async (req, res) => {
   try {
+    console.log("request :>> ", req);
     const { filename } = req.body;
 
     const imagePath = path.join(__dirname, "images", filename);
