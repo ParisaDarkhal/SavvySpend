@@ -7,12 +7,21 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 const OpenAI = require("openai");
+const mysql = require("mysql");
 
 const app = express();
 const openai = new OpenAI(process.env.OPENAI_API_KEY);
 app.use(cors());
 app.use(bodyParser.json());
 const port = 3001;
+
+//mysql config
+const pool = mysql.createPool({
+  host: process.env.HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+});
 
 // Configure Multer for file upload
 const storage = multer.diskStorage({
@@ -84,10 +93,105 @@ app.post("/extract-text", async (req, res) => {
 //get the markdwon info from frontend
 app.post("/save", async (req, res) => {
   try {
-    console.log("req.body :>> ", req.body);
+    // console.log("req.body :>> ", req.body);
     const receipt = req.body.text;
     const JsonReceipt = await convertToJson(receipt);
-    console.log("JsonReceipt :>> ", JsonReceipt);
+
+    ////
+    pool.getConnection((err, connection) => {
+      if (err) throw err;
+
+      // Extract date
+
+      console.log("JsonReceipt :>> ", JsonReceipt);
+      const date = JsonReceipt["Date"];
+      console.log("date :>> ", date);
+
+      // Iterate through Food items
+      const foodItems = JsonReceipt["CategorizedItems"]["Food"];
+      for (const item of foodItems) {
+        const name = item.name;
+        const price = item.price;
+        const categoryId = 1; // Assuming you have a category ID for "Food"
+
+        // Insert each item into receipt table
+        const insertItem = `INSERT INTO receipt (category_id, name, price, date) VALUES (?, ?, ?, ?)`;
+        connection.query(
+          insertItem,
+          [categoryId, name, price, date],
+          (err, result) => {
+            if (err) throw err;
+            console.log(`Inserted item: ${name} with price ${price}`);
+          }
+        );
+      }
+
+      // Iterate through Clothing items
+      const clothingItems = JsonReceipt["CategorizedItems"]["Clothing"];
+      for (const item of clothingItems) {
+        const name = item.name;
+        const price = item.price;
+        const categoryId = 2; // Assuming you have a category ID for "Clothing"
+
+        // Insert each item into receipt table
+        const insertItem = `INSERT INTO receipt (category_id, name, price, date) VALUES (?, ?, ?, ?)`;
+        connection.query(
+          insertItem,
+          [categoryId, name, price, date],
+          (err, result) => {
+            if (err) throw err;
+            console.log(`Inserted item: ${name} with price ${price}`);
+          }
+        );
+      }
+
+      // Iterate through Cleaning items
+      const cleaningItems = JsonReceipt["CategorizedItems"]["Cleaning"];
+      for (const item of cleaningItems) {
+        const name = item.name;
+        const price = item.price;
+        const categoryId = 3; // Assuming you have a category ID for "Cleaning"
+
+        // Insert each item into receipt table
+        const insertItem = `INSERT INTO receipt (category_id, name, price, date) VALUES (?, ?, ?, ?)`;
+        connection.query(
+          insertItem,
+          [categoryId, name, price, date],
+          (err, result) => {
+            if (err) throw err;
+            console.log(`Inserted item: ${name} with price ${price}`);
+          }
+        );
+      }
+
+      // Iterate through Miscellaneous items
+      const miscellaneousItems =
+        JsonReceipt["CategorizedItems"]["Miscellaneous"];
+      for (const item of miscellaneousItems) {
+        const name = item.name;
+        const price = item.price;
+        const categoryId = 4; // Assuming you have a category ID for "Miscellaneous"
+
+        // Insert each item into receipt table
+        const insertItem = `INSERT INTO receipt (category_id, name, price, date) VALUES (?, ?, ?, ?)`;
+        connection.query(
+          insertItem,
+          [categoryId, name, price, date],
+          (err, result) => {
+            if (err) throw err;
+            console.log(`Inserted item: ${name} with price ${price}`);
+          }
+        );
+      }
+      // Handle other categories similarly
+      // ...
+
+      connection.release();
+      // }
+      // );
+    });
+    res.json({ message: "success", sendData: JsonReceipt });
+    ////
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error saving receipt backend." });
@@ -121,14 +225,13 @@ const convertToJson = async (receipt) => {
         
         example response:
         {
-        "Date":"June-26-2023", Food:[{"name":"Bell Pepper","price":6.34},{"name":"Cilantro","price":0.58}]}.\n\n${receipt}\n\n only return JSON`,
+        "Date":"2023-06-26", "CategorizedItems":{"Food":[{"name":"Bell Pepper","price":6.34},{"name":"Cilantro","price":0.58}]}}.\n\n${receipt}\n\n only return JSON`,
       },
     ],
     model: "gpt-3.5-turbo",
   });
   console.log("chatCompletion :>> ", chatCompletion.choices[0].message.content);
-  // return chatCompletion.choices[0].message.content;
-  const result = chatCompletion.choices[0].message.content;
+  return JSON.parse(chatCompletion.choices[0].message.content);
 };
 
 // Serve static files from the "build" directory (assuming your React app is built there)
