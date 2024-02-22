@@ -89,7 +89,7 @@ function FileUploader() {
         });
 
         if (textExtractionResponse) {
-          const extractedText = textExtractionResponse.data.text;
+          const extractedText = textExtractionResponse.data.receiptInfo;
           setText(extractedText);
 
           console.log("Extracted text:", extractedText);

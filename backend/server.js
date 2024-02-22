@@ -43,6 +43,20 @@ app.post("/upload", upload.single("receiptImage"), async (req, res) => {
   }
 });
 
+//categorize items in receipt
+const categorizeItems = async (text) => {
+  const chatCompletion = await openai.chat.completions.create({
+    messages: [
+      {
+        role: "user",
+        content: `I have this walmart receipt. I want you to show the date of receipt and also categorize the items in 3 categories: food, clothing, cleaning, others. make sure to include the price of each item as well. your response must be in markdown.\n\n${text}`,
+      },
+    ],
+    model: "gpt-3.5-turbo",
+  });
+  console.log("chatCompletion :>> ", chatCompletion.choices[0].message.content);
+  return chatCompletion.choices[0].message.content;
+};
 // Text extraction route
 app.post("/extract-text", async (req, res) => {
   try {
@@ -53,11 +67,14 @@ app.post("/extract-text", async (req, res) => {
     const worker = await createWorker("eng");
     const ret = await worker.recognize(imagePath);
     const text = ret.data.text;
-    console.log(text);
     await worker.terminate();
+    const receiptInfo = await categorizeItems(text);
 
     // Send the extracted text to the frontend
-    res.json({ message: "Text extracted successfully!", text });
+    res.json({
+      message: "Text extracted successfully!",
+      receiptInfo: receiptInfo,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error extracting text" });
