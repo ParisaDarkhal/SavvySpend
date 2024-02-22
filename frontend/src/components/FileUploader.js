@@ -107,6 +107,17 @@ function FileUploader() {
     }
   };
 
+  const handleSave = async () => {
+    try {
+      const sendData = await axios.post("/save", {
+        text,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error saving receipt");
+    }
+  };
+
   return (
     <div className="file-uploader">
       <input type="file" onChange={handleFileChange} />
@@ -153,6 +164,7 @@ function FileUploader() {
               <p style={{ whiteSpace: "pre", textAlign: "left" }}>{text}</p>
             </div>
           )}
+          <button onClick={handleSave}>Save</button>
         </div>
       </div>
     </div>
