@@ -25,9 +25,6 @@ function FileUploader() {
 
     // Update state with the selected file
     setSelectedFile(selectedFile);
-
-    // display the filename or size in UI
-    console.log("Selected file:", selectedFile.name);
   };
 
   const handleDragOver = (event) => {
@@ -109,12 +106,13 @@ function FileUploader() {
 
   const handleSave = async () => {
     try {
-      const sendData = await axios.post("/save", {
-        text,
-      });
+      const sendData = await axios.post("/save", { text });
+      if (sendData) {
+        alert("Receipt saved.");
+      }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error saving receipt");
+      alert("Error saving receipt frontend");
     }
   };
 
