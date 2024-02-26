@@ -7,7 +7,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 const OpenAI = require("openai");
-const sequelize = require("./config/connection");
+const mysql = require("mysql");
 
 const app = express();
 const openai = new OpenAI(process.env.OPENAI_API_KEY);
@@ -15,9 +15,13 @@ app.use(cors());
 app.use(bodyParser.json());
 const port = 3001;
 
-const Category = require("./models/Category");
-const Receipt = require("./models/Receipt");
-const { where } = require("sequelize");
+//mysql config
+const pool = mysql.createPool({
+  host: process.env.HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+});
 
 // Configure Multer for file upload
 const storage = multer.diskStorage({
@@ -89,38 +93,105 @@ app.post("/extract-text", async (req, res) => {
 //get the markdwon info from frontend
 app.post("/save", async (req, res) => {
   try {
+    // console.log("req.body :>> ", req.body);
     const receipt = req.body.text;
     const JsonReceipt = await convertToJson(receipt);
 
-    // Extract date
-    const date = JsonReceipt["Date"];
+    ////
+    pool.getConnection((err, connection) => {
+      if (err) throw err;
 
-    // Define a function to insert items
-    const insertItems = async (items, categoryId) => {
-      for (const item of items) {
-        const { name, price } = item;
-        try {
-          await Receipt.create({
-            category_id: categoryId,
-            name,
-            price,
-            date,
-          });
-          console.log(`Inserted item: ${name} with price ${price}`);
-        } catch (err) {
-          console.error(`Failed to insert item: ${name}. Error: ${err}`);
-        }
+      // Extract date
+
+      console.log("JsonReceipt :>> ", JsonReceipt);
+      const date = JsonReceipt["Date"];
+      console.log("date :>> ", date);
+
+      // Iterate through Food items
+      const foodItems = JsonReceipt["CategorizedItems"]["Food"];
+      for (const item of foodItems) {
+        const name = item.name;
+        const price = item.price;
+        const categoryId = 1; // Assuming you have a category ID for "Food"
+
+        // Insert each item into receipt table
+        const insertItem = `INSERT INTO receipt (category_id, name, price, date) VALUES (?, ?, ?, ?)`;
+        connection.query(
+          insertItem,
+          [categoryId, name, price, date],
+          (err, result) => {
+            if (err) throw err;
+            console.log(`Inserted item: ${name} with price ${price}`);
+          }
+        );
       }
-    };
 
-    // Insert items by category
-    await insertItems(JsonReceipt["CategorizedItems"]["Food"], 1);
-    await insertItems(JsonReceipt["CategorizedItems"]["Clothing"], 2);
-    await insertItems(JsonReceipt["CategorizedItems"]["Cleaning"], 3);
-    await insertItems(JsonReceipt["CategorizedItems"]["Miscellaneous"], 4);
-    // Handle other categories similarly
+      // Iterate through Clothing items
+      const clothingItems = JsonReceipt["CategorizedItems"]["Clothing"];
+      for (const item of clothingItems) {
+        const name = item.name;
+        const price = item.price;
+        const categoryId = 2; // Assuming you have a category ID for "Clothing"
 
+        // Insert each item into receipt table
+        const insertItem = `INSERT INTO receipt (category_id, name, price, date) VALUES (?, ?, ?, ?)`;
+        connection.query(
+          insertItem,
+          [categoryId, name, price, date],
+          (err, result) => {
+            if (err) throw err;
+            console.log(`Inserted item: ${name} with price ${price}`);
+          }
+        );
+      }
+
+      // Iterate through Cleaning items
+      const cleaningItems = JsonReceipt["CategorizedItems"]["Cleaning"];
+      for (const item of cleaningItems) {
+        const name = item.name;
+        const price = item.price;
+        const categoryId = 3; // Assuming you have a category ID for "Cleaning"
+
+        // Insert each item into receipt table
+        const insertItem = `INSERT INTO receipt (category_id, name, price, date) VALUES (?, ?, ?, ?)`;
+        connection.query(
+          insertItem,
+          [categoryId, name, price, date],
+          (err, result) => {
+            if (err) throw err;
+            console.log(`Inserted item: ${name} with price ${price}`);
+          }
+        );
+      }
+
+      // Iterate through Miscellaneous items
+      const miscellaneousItems =
+        JsonReceipt["CategorizedItems"]["Miscellaneous"];
+      for (const item of miscellaneousItems) {
+        const name = item.name;
+        const price = item.price;
+        const categoryId = 4; // Assuming you have a category ID for "Miscellaneous"
+
+        // Insert each item into receipt table
+        const insertItem = `INSERT INTO receipt (category_id, name, price, date) VALUES (?, ?, ?, ?)`;
+        connection.query(
+          insertItem,
+          [categoryId, name, price, date],
+          (err, result) => {
+            if (err) throw err;
+            console.log(`Inserted item: ${name} with price ${price}`);
+          }
+        );
+      }
+      // Handle other categories similarly
+      // ...
+
+      connection.release();
+      // }
+      // );
+    });
     res.json({ message: "success", sendData: JsonReceipt });
+    ////
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error saving receipt backend." });
