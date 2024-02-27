@@ -7,6 +7,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 const OpenAI = require("openai");
+const { Sequelize } = require("sequelize");
 const sequelize = require("./config/connection");
 
 const app = express();
@@ -15,9 +16,18 @@ app.use(cors());
 app.use(bodyParser.json());
 const port = 3001;
 
-const Category = require("./models/Category");
-const Receipt = require("./models/Receipt");
-const { where } = require("sequelize");
+const Category = require("./db/models/Category");
+const Receipt = require("./db/models/Receipt");
+// const { where } = require("sequelize");
+
+const database = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    dialect: "mysql",
+  }
+);
 
 // Configure Multer for file upload
 const storage = multer.diskStorage({
@@ -59,7 +69,7 @@ const categorizeItems = async (text) => {
     ],
     model: "gpt-3.5-turbo",
   });
-  console.log("chatCompletion :>> ", chatCompletion.choices[0].message.content);
+  // console.log("chatCompletion :>> ", chatCompletion.choices[0].message.content);
   return chatCompletion.choices[0].message.content;
 };
 // Text extraction route
@@ -98,7 +108,9 @@ app.post("/save", async (req, res) => {
     // Define a function to insert items
     const insertItems = async (items, categoryId) => {
       for (const item of items) {
-        const { name, price } = item;
+        const name = item.name;
+        const price = item.price;
+
         try {
           await Receipt.create({
             category_id: categoryId,
@@ -106,7 +118,7 @@ app.post("/save", async (req, res) => {
             price,
             date,
           });
-          console.log(`Inserted item: ${name} with price ${price}`);
+          // console.log(`Inserted item: ${name} with price ${price}`);
         } catch (err) {
           console.error(`Failed to insert item: ${name}. Error: ${err}`);
         }
@@ -114,10 +126,13 @@ app.post("/save", async (req, res) => {
     };
 
     // Insert items by category
-    await insertItems(JsonReceipt["CategorizedItems"]["Food"], 1);
-    await insertItems(JsonReceipt["CategorizedItems"]["Clothing"], 2);
-    await insertItems(JsonReceipt["CategorizedItems"]["Cleaning"], 3);
-    await insertItems(JsonReceipt["CategorizedItems"]["Miscellaneous"], 4);
+    await insertItems(JsonReceipt["CategorizedItems"]["Food"] || [], 1);
+    await insertItems(JsonReceipt["CategorizedItems"]["Clothing"] || [], 2);
+    await insertItems(JsonReceipt["CategorizedItems"]["Cleaning"] || [], 3);
+    await insertItems(
+      JsonReceipt["CategorizedItems"]["Miscellaneous"] || [],
+      4
+    );
     // Handle other categories similarly
 
     res.json({ message: "success", sendData: JsonReceipt });
@@ -159,13 +174,18 @@ const convertToJson = async (receipt) => {
     ],
     model: "gpt-3.5-turbo",
   });
-  console.log("chatCompletion :>> ", chatCompletion.choices[0].message.content);
+
   return JSON.parse(chatCompletion.choices[0].message.content);
 };
 
 // Serve static files from the "build" directory (assuming your React app is built there)
 app.use(express.static("build"));
 
-app.listen(port, () => {
-  console.log(`🐱 Server listening on port ${port}`);
+// Starts the server to begin listening: first we need to connect to the database and then run the server
+// false can be turned to true ONLY first time when I want to make the database
+sequelize.sync({ force: false }).then(() => {
+  database.sync();
+  app.listen(port, () => {
+    console.log(`🐱 Server listening on port ${port}`);
+  });
 });

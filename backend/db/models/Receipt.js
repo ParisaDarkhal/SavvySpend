@@ -1,5 +1,5 @@
 const { Model, DataTypes } = require("sequelize");
-const sequelize = require("../config/connection");
+const sequelize = require("../../config/connection");
 
 class Receipt extends Model {}
 
@@ -36,7 +36,7 @@ Receipt.init(
     sequelize,
     timestamps: false,
     freezeTableName: true,
-    underscored: TimeoutError,
+    underscored: true,
     modelName: "receipt",
   }
 );
