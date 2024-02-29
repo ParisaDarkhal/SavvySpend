@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Dropzone from "react-dropzone";
 import axios from "axios";
+import { DNA } from "react-loader-spinner";
 
 function FileUploader() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -69,21 +70,30 @@ function FileUploader() {
     formData.append("filename", selectedFile.name);
 
     try {
-      const response = await axios.post("/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:3001/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response) {
         alert("Receipt uploaded successfully!");
+        setIsLoading(true);
+
         // Get the filename from the response or server-side code
         const uploadedFilename = response.data.filename;
 
         // Send another request to your backend to extract text
-        const textExtractionResponse = await axios.post("/extract-text", {
-          filename: uploadedFilename,
-        });
+        const textExtractionResponse = await axios.post(
+          "http://localhost:3001/extract-text",
+          {
+            filename: uploadedFilename,
+          }
+        );
 
         if (textExtractionResponse) {
           const extractedText = textExtractionResponse.data.receiptInfo;
@@ -98,6 +108,7 @@ function FileUploader() {
         console.error("Error uploading receipt:", response.data);
         alert("Error uploading receipt");
       }
+      setIsLoading(false);
     } catch (error) {
       console.error("Error:", error);
       alert("Error uploading and processing receipt");
@@ -106,7 +117,7 @@ function FileUploader() {
 
   const handleSave = async () => {
     try {
-      const sendData = await axios.post("/save", { text });
+      const sendData = await axios.post("http://localhost:3001/save", { text });
       if (sendData) {
         alert("Receipt saved.");
       }
@@ -117,8 +128,12 @@ function FileUploader() {
   };
 
   return (
-    <div className="file-uploader">
-      <input type="file" onChange={handleFileChange} />
+    <div className="file-uploader mt-4">
+      <input
+        className=" bg-gradient-to-l from-pink-300 to-purple-500 text-white font-bold py-2 px-4 rounded shadow-lg hover:shadow-xl transition duration-300"
+        type="file"
+        onChange={handleFileChange}
+      />
       <Dropzone
         onDrop={handleDrop}
         onDragEnter={handleDragOver}
@@ -144,9 +159,17 @@ function FileUploader() {
           </div>
         )}
       </Dropzone>
-      <button onClick={handleSubmit}>Upload Receipt</button>
+      <button
+        className="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 "
+        onClick={handleSubmit}
+      >
+        Upload Receipt
+      </button>
+      <hr className=" h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
       <div className="ReceiptText">
-        <h3>Text Extracted</h3>
+        <h3 className="text-xl font-semibold dark:text-white">
+          Your Receipt Extracted Content
+        </h3>
         <div
           style={{
             backgroundColor: dragOver ? "#eee" : "#fff",
@@ -156,13 +179,31 @@ function FileUploader() {
             borderRadius: "5px",
           }}
         >
+          {isLoading ? (
+            <DNA
+              visible={true}
+              height="80"
+              width="80"
+              ariaLabel="dna-loading"
+              wrapperStyle={{}}
+              wrapperClass="dna-wrapper"
+              type="TailSpin"
+            />
+          ) : (
+            <button>Extracted Text</button>
+          )}
           {text && (
             <div className="extracted-text-box">
-              <h2>Extracted Text</h2>
+              {/* <h2>Extracted Text</h2> */}
               <p style={{ whiteSpace: "pre", textAlign: "left" }}>{text}</p>
             </div>
           )}
-          <button onClick={handleSave}>Save</button>
+          <button
+            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+            onClick={handleSave}
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>
