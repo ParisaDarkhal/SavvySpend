@@ -189,14 +189,14 @@ const convertToJson = async (receipt) => {
 
 ///////////
 //receive data from database and give advice to the user
-app.post("/receipts", async (req, res) => {
+app.post("/advice", async (req, res) => {
   try {
     const receipts = await Receipt.findAll({
       attributes: ["name", "price", "category"],
     });
-    res.json(receipts);
     // console.log("receipts :>> ", receipts);
-    console.log(giveAdvice(receipts));
+    const adviceData = await giveAdvice(receipts);
+    res.json(adviceData);
   } catch (error) {
     console.error(error);
     res
@@ -212,13 +212,15 @@ const giveAdvice = async (receiptData) => {
     messages: [
       {
         role: "user",
-        content: `I have  the list of my shopping during the last month here: ${expenses}\n\n categories: food, clothing, cleaning, miscellaneous.\n\n I want you to review my shopping list and predict my shopping pattern and tell me about it. Then tell me what I spend the most on. Then give me 3 advice based on my shopping pattern to help me save money, based on my shopping pattern. only return JSON`,
+        content: `I have  the list of my shopping during the last month here: ${expenses}\n\n categories: food, clothing, cleaning, miscellaneous.\n\n I want you to review my shopping list and predict my shopping pattern and tell me about it (predicted_shopping_pattern). Then tell me what I spend the most on (most_spent_category). Then give me 3 advice based on my shopping pattern to help me save money, based on my shopping pattern (money_saving_advice). only return JSON`,
       },
     ],
     model: "gpt-3.5-turbo",
   });
   const AIresponse = JSON.parse(AIanalize.choices[0].message.content);
   console.log("AIresponse :>> ", AIresponse);
+  return AIresponse;
+  // res.json(AIresponse);
 };
 ///////////
 

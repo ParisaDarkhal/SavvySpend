@@ -22,7 +22,7 @@ function Navbar() {
 
   // Return your navbar JSX
   return (
-    <nav className="sticky top-0 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center justify-between p-4">
+    <nav className="sticky top-0 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center justify-between p-1">
       {/* Logo */}
       <div className="flex items-center ">
         <img src={savvyspend} alt="SavvySpend logo" className="size-16 mr-2" />
@@ -58,9 +58,9 @@ function Navbar() {
         <a href="#" className="hover:bg-pink-300 px-3 py-2 rounded">
           About
         </a>
-        <a href="#" className="hover:bg-pink-200 px-3 py-2 rounded">
+        <a href="/advice" className="hover:bg-pink-200 px-3 py-2 rounded">
           <button
-            onClick={handleAdviseMe}
+            // onClick={handleAdviseMe}
             className="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 "
           >
             Advise Me
