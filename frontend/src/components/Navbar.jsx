@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 // import savvyspend from "../assets/images/savvyspend-logo.png";
-import savvyspend from "./images/savvyspend-logo.png";
+import savvyspend from "./images/savvyspend-logo_prev_ui.png";
 
 const handleAdviseMe = async () => {
   try {
