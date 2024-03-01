@@ -9,6 +9,8 @@ require("dotenv").config();
 const OpenAI = require("openai");
 const { Sequelize } = require("sequelize");
 const sequelize = require("./config/connection");
+// const Category = require("./db/models/Category");
+const Receipt = require("./db/models/Receipt");
 
 const app = express();
 const openai = new OpenAI(process.env.OPENAI_API_KEY);
@@ -16,8 +18,6 @@ app.use(cors());
 app.use(bodyParser.json());
 const port = 3001;
 
-const Category = require("./db/models/Category");
-const Receipt = require("./db/models/Receipt");
 // const { where } = require("sequelize");
 
 const database = new Sequelize(
@@ -106,14 +106,17 @@ app.post("/save", async (req, res) => {
     const date = JsonReceipt["Date"];
 
     // Define a function to insert items
-    const insertItems = async (items, categoryId) => {
+    const insertItems = async (items, category) => {
+      if (!items) {
+        return;
+      }
       for (const item of items) {
         const name = item.name;
         const price = item.price;
 
         try {
           await Receipt.create({
-            category_id: categoryId,
+            category,
             name,
             price,
             date,
@@ -126,12 +129,18 @@ app.post("/save", async (req, res) => {
     };
 
     // Insert items by category
-    await insertItems(JsonReceipt["CategorizedItems"]["Food"] || [], 1);
-    await insertItems(JsonReceipt["CategorizedItems"]["Clothing"] || [], 2);
-    await insertItems(JsonReceipt["CategorizedItems"]["Cleaning"] || [], 3);
+    await insertItems(JsonReceipt["CategorizedItems"]["Food"] || [], "food");
+    await insertItems(
+      JsonReceipt["CategorizedItems"]["Clothing"] || [],
+      "clothing"
+    );
+    await insertItems(
+      JsonReceipt["CategorizedItems"]["Cleaning"] || [],
+      "cleaning"
+    );
     await insertItems(
       JsonReceipt["CategorizedItems"]["Miscellaneous"] || [],
-      4
+      "miscellaneous"
     );
     // Handle other categories similarly
 
@@ -177,6 +186,41 @@ const convertToJson = async (receipt) => {
 
   return JSON.parse(chatCompletion.choices[0].message.content);
 };
+
+///////////
+//receive data from database and give advice to the user
+app.post("/receipts", async (req, res) => {
+  try {
+    const receipts = await Receipt.findAll({
+      attributes: ["name", "price", "category"],
+    });
+    res.json(receipts);
+    // console.log("receipts :>> ", receipts);
+    console.log(giveAdvice(receipts));
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching receipts" });
+  }
+});
+
+// give advice to the user
+const giveAdvice = async (receiptData) => {
+  const expenses = receiptData.map((receipt) => receipt.dataValues);
+  const AIanalize = await openai.chat.completions.create({
+    messages: [
+      {
+        role: "user",
+        content: `I have  the list of my shopping during the last month here: ${expenses}\n\n categories: food, clothing, cleaning, miscellaneous.\n\n I want you to review my shopping list and predict my shopping pattern and tell me about it. Then tell me what I spend the most on. Then give me 3 advice based on my shopping pattern to help me save money, based on my shopping pattern. only return JSON`,
+      },
+    ],
+    model: "gpt-3.5-turbo",
+  });
+  const AIresponse = JSON.parse(AIanalize.choices[0].message.content);
+  console.log("AIresponse :>> ", AIresponse);
+};
+///////////
 
 // Serve static files from the "build" directory (assuming your React app is built there)
 app.use(express.static("build"));

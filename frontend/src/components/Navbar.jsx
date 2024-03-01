@@ -1,5 +1,18 @@
 import React, { useEffect } from "react";
-import savvyspend from "../assets/images/savvyspend-logo.png";
+import axios from "axios";
+// import savvyspend from "../assets/images/savvyspend-logo.png";
+import savvyspend from "./images/savvyspend-logo.png";
+
+const handleAdviseMe = async () => {
+  try {
+    const response = await axios.post("http://localhost:3001/receipts");
+    console.log(response.data);
+    // Here you can handle the response data
+  } catch (error) {
+    console.error(error);
+    // Here you can handle the error
+  }
+};
 
 function Navbar() {
   // This function will run when the component mounts and unmounts
@@ -23,7 +36,7 @@ function Navbar() {
     <nav className="sticky top-0 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center justify-between p-4">
       {/* Logo */}
       <div className="flex items-center ">
-        {/* <img src="savvyspend" alt="SavvySpend logo" class="h-8 mr-2" /> */}
+        <img src={savvyspend} alt="SavvySpend logo" class="size-16 mr-2" />
         <h1 className="font-bold text-xl">SavvySpend</h1>
       </div>
       {/* Menu button */}
@@ -46,20 +59,25 @@ function Navbar() {
         </button>
       </div> */}
       {/* Links */}
-      {/* <div id="menu" class="hidden md:flex space-x-4">
-        <a href="#" class="hover:bg-pink-400 px-3 py-2 rounded">
+      <div id="menu" className="hidden md:flex space-x-4">
+        <a
+          href="/upload"
+          className="bg-white-100 hover:bg-pink-300 px-3 py-2 rounded"
+        >
           Home
         </a>
-        <a href="#" class="hover:bg-pink-400 px-3 py-2 rounded">
+        <a href="#" className="hover:bg-pink-300 px-3 py-2 rounded">
           About
         </a>
-        <a href="#" class="hover:bg-pink-400 px-3 py-2 rounded">
-          Services
+        <a href="#" className="hover:bg-pink-200 px-3 py-2 rounded">
+          <button
+            onClick={handleAdviseMe}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 "
+          >
+            Advise Me
+          </button>
         </a>
-        <a href="#" class="hover:bg-pink-400 px-3 py-2 rounded">
-          Contact
-        </a>
-      </div> */}
+      </div>
     </nav>
   );
 }

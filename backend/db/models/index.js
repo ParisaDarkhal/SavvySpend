@@ -1,7 +1,7 @@
-const Category = require("./Category");
-const Receipt = require("./Receipt");
+// const Category = require("./Category.js");
+// const Receipt = require("./Receipt.js");
 
-Category.hasOne(Receipt);
-Receipt.belongsTo(Category);
+// Category.hasOne(Receipt);
+// Receipt.belongsTo(Category);
 
-module.exports = { Category, Receipt };
+// module.exports = { Category, Receipt };
