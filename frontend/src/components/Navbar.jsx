@@ -3,17 +3,6 @@ import axios from "axios";
 // import savvyspend from "../assets/images/savvyspend-logo.png";
 import savvyspend from "./images/savvyspend-logo_prev_ui.png";
 
-const handleAdviseMe = async () => {
-  try {
-    const response = await axios.post("http://localhost:3001/receipts");
-    console.log(response.data);
-    // Here you can handle the response data
-  } catch (error) {
-    console.error(error);
-    // Here you can handle the error
-  }
-};
-
 function Navbar() {
   // This function will run when the component mounts and unmounts
   //   useEffect(() => {
@@ -36,7 +25,7 @@ function Navbar() {
     <nav className="sticky top-0 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center justify-between p-4">
       {/* Logo */}
       <div className="flex items-center ">
-        <img src={savvyspend} alt="SavvySpend logo" class="size-16 mr-2" />
+        <img src={savvyspend} alt="SavvySpend logo" className="size-16 mr-2" />
         <h1 className="font-bold text-xl">SavvySpend</h1>
       </div>
       {/* Menu button */}
