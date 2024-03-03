@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import axios from "axios";
 // import savvyspend from "../assets/images/savvyspend-logo.png";
 import savvyspend from "./images/savvyspend-logo_prev_ui.png";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   // This function will run when the component mounts and unmounts
@@ -58,14 +59,14 @@ function Navbar() {
         <a href="#" className="hover:bg-pink-300 px-3 py-2 rounded">
           About
         </a>
-        <a href="/advice" className="hover:bg-pink-200 px-3 py-2 rounded">
+        <Link to="/advice" className="hover:bg-pink-200 px-3 py-2 rounded">
           <button
             // onClick={handleAdviseMe}
             className="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 "
           >
             Advise Me
           </button>
-        </a>
+        </Link>
       </div>
     </nav>
   );

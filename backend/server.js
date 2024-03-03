@@ -189,7 +189,7 @@ const convertToJson = async (receipt) => {
 
 ///////////
 //receive data from database and give advice to the user
-app.post("/advice", async (req, res) => {
+app.get("/advice", async (req, res) => {
   try {
     const receipts = await Receipt.findAll({
       attributes: ["name", "price", "category"],
@@ -212,7 +212,7 @@ const giveAdvice = async (receiptData) => {
     messages: [
       {
         role: "user",
-        content: `I have  the list of my shopping during the last month here: ${expenses}\n\n categories: food, clothing, cleaning, miscellaneous.\n\n I want you to review my shopping list and predict my shopping pattern and tell me about it (predicted_shopping_pattern). Then tell me what I spend the most on (most_spent_category). Then give me 3 advice based on my shopping pattern to help me save money, based on my shopping pattern (money_saving_advice). only return JSON`,
+        content: `I have  the list of my shopping during the last month here: ${expenses}\n\n categories: food, clothing, cleaning, miscellaneous.\n\n I want you to review my shopping list and predict my shopping pattern and tell me about it (predicted_shopping_pattern) return the answer in this shape: predicted_shopping_pattern: { food: 10, clothing: 7, cleaning: 5, miscellaneous: 9 }. Then tell me what I spend the most on (most_spent_category). Then give me 3 advice based on my shopping pattern to help me save money, based on my shopping pattern (money_saving_advice). only return JSON`,
       },
     ],
     model: "gpt-3.5-turbo",
