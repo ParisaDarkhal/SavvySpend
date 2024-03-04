@@ -23,7 +23,7 @@ function Navbar() {
 
   // Return your navbar JSX
   return (
-    <nav className="sticky top-0 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center justify-between p-1">
+    <nav className="sticky top-0 w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center justify-between p-1 z-index-100">
       {/* Logo */}
       <div className="flex items-center ">
         <img src={savvyspend} alt="SavvySpend logo" className="size-16 mr-2" />

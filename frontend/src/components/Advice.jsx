@@ -4,11 +4,13 @@ import expenses from "./images/expenses.jpg";
 import grocerries from "./images/grocerries.png";
 import savvyspend from "./images/savvyspend-logo.png";
 import { DNA } from "react-loader-spinner";
+import { Chart } from "react-google-charts";
 
 function Advice() {
   const [adviceData, setAdviceData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,6 +18,18 @@ function Advice() {
       try {
         const response = await axios.get("http://localhost:3001/advice");
         setAdviceData(response.data);
+        const chData = [
+          ["Category", "NumOfShopped"],
+          ["Food", response.data.predicted_shopping_pattern.food || 0],
+          ["Clothing", response.data.predicted_shopping_pattern.clothing || 0],
+          ["Cleaning", response.data.predicted_shopping_pattern.cleaning || 0],
+          [
+            "Miscellanous",
+            response.data.predicted_shopping_pattern.miscellaneous || 0,
+          ],
+        ];
+
+        setChartData(chData);
       } catch (error) {
         setError(error);
       }
@@ -44,7 +58,7 @@ function Advice() {
         {error && <p>Error! :{error.message}</p>}
         {adviceData && (
           <>
-            <div class="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-2xl m-3">
+            <div class="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-5xl m-3">
               <div class="md:flex">
                 <div class="md:flex-shrink-0">
                   <img
@@ -73,6 +87,19 @@ function Advice() {
                       {adviceData.predicted_shopping_pattern.miscellaneous}
                     </li>
                   </ul>
+                </div>
+                <div>
+                  {chartData && (
+                    <Chart
+                      chartType="PieChart"
+                      data={chartData}
+                      options={{
+                        title: "Expenses",
+                      }}
+                      width={"100%"}
+                      height={"200px"}
+                    />
+                  )}
                 </div>
               </div>
             </div>
