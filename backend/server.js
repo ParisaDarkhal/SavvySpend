@@ -9,7 +9,6 @@ require("dotenv").config();
 const OpenAI = require("openai");
 const { Sequelize } = require("sequelize");
 const sequelize = require("./config/connection");
-// const Category = require("./db/models/Category");
 const Receipt = require("./db/models/Receipt");
 
 const app = express();
@@ -17,8 +16,6 @@ const openai = new OpenAI(process.env.OPENAI_API_KEY);
 app.use(cors());
 app.use(bodyParser.json());
 const port = 3001;
-
-// const { where } = require("sequelize");
 
 const database = new Sequelize(
   process.env.DB_NAME,
@@ -192,7 +189,12 @@ const convertToJson = async (receipt) => {
 app.get("/advice", async (req, res) => {
   try {
     const receipts = await Receipt.findAll({
-      attributes: ["name", "price", "category"],
+      attributes: [
+        [sequelize.fn("COUNT", sequelize.literal("*")), "expenses"],
+        [sequelize.fn("SUM", sequelize.col("price")), "total"],
+        "category",
+      ],
+      group: ["category"],
     });
     // console.log("receipts :>> ", receipts);
     const adviceData = await giveAdvice(receipts);
@@ -208,15 +210,17 @@ app.get("/advice", async (req, res) => {
 // give advice to the user
 const giveAdvice = async (receiptData) => {
   const expenses = receiptData.map((receipt) => receipt.dataValues);
+  console.log("expenses :>> ", expenses);
   const AIanalize = await openai.chat.completions.create({
     messages: [
       {
         role: "user",
-        content: `I have  the list of my shopping during the last month here: ${expenses}\n\n categories: food, clothing, cleaning, miscellaneous.\n\n I want you to review my shopping list and predict my shopping pattern and tell me about it (predicted_shopping_pattern) return the answer in this shape: predicted_shopping_pattern: { food: 10, clothing: 7, cleaning: 5, miscellaneous: 9 }. Then tell me what I spend the most on (most_spent_category). Then give me 3 advice based on my shopping pattern to help me save money, based on my shopping pattern (money_saving_advice). only return JSON`,
+        content: `I have  the list of my shopping during the last month here: ${expenses}\n\n in which "expences" is the number of occurance of that shopping category, "total" is in dollar and shows the amount of money spent in that category.\n\n I want you to review my shopping list and predict my shopping pattern and tell me about it (predicted_shopping_pattern) return the answer in this shape in four categories including: food, clothing, cleaning, miscellaneous: for example: predicted_shopping_pattern: { ${expenses[0].category}:  ${expenses[0].total} , ${expenses[1].category}:  ${expenses[1].total} , ${expenses[2].category}:  ${expenses[2].total}, ${expenses[3].category}:  ${expenses[3].total}}. don't round the numbers . Then tell me what I spend the most on (most_spent_category). Then give me 3 advice based on my shopping pattern to help me save money, based on my shopping pattern (money_saving_advice). only return JSON`,
       },
     ],
     model: "gpt-3.5-turbo",
   });
+  // console.log("AIanalize :>> ", AIanalize);
   const AIresponse = JSON.parse(AIanalize.choices[0].message.content);
   console.log("AIresponse :>> ", AIresponse);
   return AIresponse;

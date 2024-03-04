@@ -32,7 +32,9 @@ function Advice() {
           ],
         ];
 
-        setChartData(chData);
+        console.log("chData :>> ", chData);
+
+        await setChartData(chData);
       } catch (error) {
         setError(error);
       }
@@ -61,17 +63,17 @@ function Advice() {
         {error && <p>Error! :{error.message}</p>}
         {adviceData && (
           <>
-            <div class="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-5xl m-3">
-              <div class="md:flex">
-                <div class="md:flex-shrink-0">
+            <div className="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-5xl m-3">
+              <div className="md:flex">
+                <div className="md:flex-shrink-0">
                   <img
-                    class="h-48 w-full object-cover md:w-48 me-20"
+                    className="h-48 w-full object-cover md:w-48 me-20"
                     src={expenses}
                     alt="expenses"
                   />
                 </div>
-                <div class="p-8">
-                  <div class="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center md:text-left px-5">
+                <div className="p-8">
+                  <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center md:text-left px-5">
                     Your Shopping Pattern
                   </div>
                   <ul>
@@ -86,7 +88,7 @@ function Advice() {
                     </li>
                     <li>
                       {" "}
-                      miscellaneous:
+                      Miscellaneous:
                       {adviceData.predicted_shopping_pattern.miscellaneous}
                     </li>
                   </ul>
@@ -108,39 +110,62 @@ function Advice() {
             </div>
 
             <div>
-              <div class="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-2xl m-3">
-                <div class="md:flex">
-                  <div class="p-8">
-                    <div class="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center md:text-left px-5">
+              <div className="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-2xl m-3">
+                <div className="md:flex">
+                  <div className="p-8">
+                    <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center md:text-left px-5">
                       Biggest Expenses:
                     </div>
-                    <p class="mt-2 text-gray-500">
+                    <p className="mt-2 text-gray-500">
                       {adviceData.most_spent_category}
                     </p>
                   </div>
-                  <div class="md:flex-shrink-0">
-                    <img
-                      class="h-48 w-full object-cover md:w-48 ms-20"
-                      src={grocerries}
-                      alt="grocerries"
-                    />
+                  <div className="md:flex-shrink-0">
+                    {adviceData.most_spent_category === "food" && (
+                      <img
+                        className="h-48 w-full object-cover md:w-48 ms-20"
+                        src={grocerries}
+                        alt="grocerries"
+                      />
+                    )}
+                    {adviceData.most_spent_category === "clothing" && (
+                      <img
+                        className="h-48 w-full object-cover md:w-48 ms-20"
+                        src={clothing}
+                        alt="clothing"
+                      />
+                    )}
+                    {adviceData.most_spent_category === "cleaning" && (
+                      <img
+                        className="h-48 w-full object-cover md:w-48 ms-20"
+                        src={cleaning}
+                        alt="cleaning"
+                      />
+                    )}
+                    {adviceData.most_spent_category === "miscellaneous" && (
+                      <img
+                        className="h-48 w-full object-cover md:w-48 ms-20"
+                        src={miscellaneous}
+                        alt="miscellaneous"
+                      />
+                    )}
                   </div>
                 </div>
               </div>
-              <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl m-3">
-                <div class="md:flex md:items-center">
-                  <div class="md:flex-shrink-0">
+              <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl m-3">
+                <div className="md:flex md:items-center">
+                  <div className="md:flex-shrink-0">
                     <img
-                      class="h-48 w-full object-cover md:w-48"
+                      className="h-48 w-full object-cover md:w-48"
                       src={savvyspend}
                       alt="savvyspand"
                     />
                   </div>
-                  <div class="p-8">
-                    <div class="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center  px-5 ">
+                  <div className="p-8">
+                    <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center  px-5 ">
                       AI Advice
                     </div>
-                    <div class="mt-3">
+                    <div className="mt-3">
                       <ol>
                         {adviceData.money_saving_advice.map((item, i) => (
                           <li key={i}>
