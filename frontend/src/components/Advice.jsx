@@ -10,7 +10,7 @@ import { DNA } from "react-loader-spinner";
 import { Chart } from "react-google-charts";
 
 function Advice() {
-  const [adviceData, setAdviceData] = useState(null);
+  const [advicesData, setAdvicesData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [chartData, setChartData] = useState(null);
@@ -20,19 +20,42 @@ function Advice() {
       setIsLoading(true);
       try {
         const response = await axios.get("http://localhost:3001/advice");
-        setAdviceData(response.data);
+        console.log("response.data:>> ", response.data.adviceData);
+
+        const adviceArray = [];
+        Object.entries(response.data.adviceData).forEach(([key, value]) => {
+          if (typeof value == "array") {
+            for (let index = 0; index < value.length; index++) {
+              adviceArray.push(`${value[i].key}: ${value[i].value}`);
+            }
+          }
+          adviceArray.push(`${key}: ${value}`);
+        });
+        console.log("adviceArray :>> ", adviceArray);
+        // console.log("advicesData :>> ", advicesData);
+
+        setAdvicesData(adviceArray);
         const chData = [
           ["Category", "NumOfShopped"],
-          ["Food", response.data.predicted_shopping_pattern.food || 0],
-          ["Clothing", response.data.predicted_shopping_pattern.clothing || 0],
-          ["Cleaning", response.data.predicted_shopping_pattern.cleaning || 0],
           [
-            "Miscellanous",
-            response.data.predicted_shopping_pattern.miscellaneous || 0,
+            response.data.expenses[0].category,
+            response.data.expenses[0].total || 0,
+          ],
+          [
+            response.data.expenses[1].category,
+            response.data.expenses[1].total || 0,
+          ],
+          [
+            response.data.expenses[2].category,
+            response.data.expenses[2].total || 0,
+          ],
+          [
+            response.data.expenses[3].category,
+            response.data.expenses[3].total || 0,
           ],
         ];
 
-        console.log("chData :>> ", chData);
+        // console.log("chData :>> ", chData);
 
         await setChartData(chData);
       } catch (error) {
@@ -61,7 +84,7 @@ function Advice() {
           </>
         )}
         {error && <p>Error! :{error.message}</p>}
-        {adviceData && (
+        {advicesData && (
           <>
             <div className="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-5xl m-3">
               <div className="md:flex">
@@ -76,9 +99,9 @@ function Advice() {
                   <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center md:text-left px-5">
                     Your Shopping Pattern
                   </div>
-                  <ul>
-                    <li> Food: {adviceData.predicted_shopping_pattern.food}</li>
-                    <li>
+                  {/* <ul> */}
+                  <p>{advicesData[0]}</p>
+                  {/* <li>
                       {" "}
                       Clothing: {adviceData.predicted_shopping_pattern.clothing}
                     </li>
@@ -90,8 +113,8 @@ function Advice() {
                       {" "}
                       Miscellaneous:
                       {adviceData.predicted_shopping_pattern.miscellaneous}
-                    </li>
-                  </ul>
+                    </li> */}
+                  {/* </ul> */}
                 </div>
                 <div>
                   {chartData && (
@@ -110,7 +133,7 @@ function Advice() {
             </div>
 
             <div>
-              <div className="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-2xl m-3">
+              {/* <div className="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-2xl m-3">
                 <div className="md:flex">
                   <div className="p-8">
                     <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center md:text-left px-5">
@@ -151,8 +174,8 @@ function Advice() {
                     )}
                   </div>
                 </div>
-              </div>
-              <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl m-3">
+              </div> */}
+              <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-5xl m-3">
                 <div className="md:flex md:items-center">
                   <div className="md:flex-shrink-0">
                     <img
@@ -167,10 +190,8 @@ function Advice() {
                     </div>
                     <div className="mt-3">
                       <ol>
-                        {adviceData.money_saving_advice.map((item, i) => (
-                          <li key={i}>
-                            {i + 1} - {item}
-                          </li>
+                        {advicesData.slice(1).map((item, i) => (
+                          <li key={i}>{item}</li>
                         ))}
                       </ol>
                     </div>

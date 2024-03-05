@@ -197,8 +197,10 @@ app.get("/advice", async (req, res) => {
       group: ["category"],
     });
     // console.log("receipts :>> ", receipts);
-    const adviceData = await giveAdvice(receipts);
-    res.json(adviceData);
+    const expenses = receipts.map((receipt) => receipt.dataValues);
+    const adviceData = await giveAdvice(expenses);
+    // console.log("adviceData :>> ", adviceData);
+    res.json({ adviceData: adviceData, expenses: expenses });
   } catch (error) {
     console.error(error);
     res
@@ -209,13 +211,12 @@ app.get("/advice", async (req, res) => {
 
 // give advice to the user
 const giveAdvice = async (receiptData) => {
-  const expenses = receiptData.map((receipt) => receipt.dataValues);
-  console.log("expenses :>> ", expenses);
+  // console.log("expenses :>> ", expenses);
   const AIanalize = await openai.chat.completions.create({
     messages: [
       {
         role: "user",
-        content: `I have  the list of my shopping during the last month here: ${expenses}\n\n in which "expences" is the number of occurance of that shopping category, "total" is in dollar and shows the amount of money spent in that category.\n\n I want you to review my shopping list and predict my shopping pattern and tell me about it (predicted_shopping_pattern) return the answer in this shape in four categories including: food, clothing, cleaning, miscellaneous: for example: predicted_shopping_pattern: { ${expenses[0].category}:  ${expenses[0].total} , ${expenses[1].category}:  ${expenses[1].total} , ${expenses[2].category}:  ${expenses[2].total}, ${expenses[3].category}:  ${expenses[3].total}}. don't round the numbers . Then tell me what I spend the most on (most_spent_category). Then give me 3 advice based on my shopping pattern to help me save money, based on my shopping pattern (money_saving_advice). only return JSON`,
+        content: `I have  the list of my shopping during the last month here: ${receiptData}\n\n i want you to predict my shooing pattern as predicted_shopping_pattern and give me 4 advices based on my shopping pattern. only return JSON`,
       },
     ],
     model: "gpt-3.5-turbo",
