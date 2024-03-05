@@ -216,7 +216,7 @@ const giveAdvice = async (receiptData) => {
     messages: [
       {
         role: "user",
-        content: `I have  the list of my shopping during the last month here: ${receiptData}\n\n i want you to predict my shooing pattern as predicted_shopping_pattern and give me 4 advices based on my shopping pattern. only return JSON`,
+        content: `I have  the list of my shopping during the last month here: ${receiptData}\n\n i want you to act like an accountant and interpret my shooing pattern as predicted_shopping_pattern, and give me 4 advices based on my shopping pattern. only return JSON`,
       },
     ],
     model: "gpt-3.5-turbo",

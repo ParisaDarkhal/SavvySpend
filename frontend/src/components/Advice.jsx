@@ -87,7 +87,7 @@ function Advice() {
         {advicesData && (
           <>
             <div className="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-5xl m-3">
-              <div className="md:flex">
+              <div className="md:flex md:items-center">
                 <div className="md:flex-shrink-0">
                   <img
                     className="h-48 w-full object-cover md:w-48 me-20"
@@ -95,26 +95,12 @@ function Advice() {
                     alt="expenses"
                   />
                 </div>
-                <div className="p-8">
+                <div className="p-6">
                   <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center md:text-left px-5">
                     Your Shopping Pattern
                   </div>
-                  {/* <ul> */}
-                  <p>{advicesData[0]}</p>
-                  {/* <li>
-                      {" "}
-                      Clothing: {adviceData.predicted_shopping_pattern.clothing}
-                    </li>
-                    <li>
-                      {" "}
-                      Cleaning: {adviceData.predicted_shopping_pattern.cleaning}
-                    </li>
-                    <li>
-                      {" "}
-                      Miscellaneous:
-                      {adviceData.predicted_shopping_pattern.miscellaneous}
-                    </li> */}
-                  {/* </ul> */}
+
+                  <p className="py-3">{advicesData[0]}</p>
                 </div>
                 <div>
                   {chartData && (
@@ -133,48 +119,6 @@ function Advice() {
             </div>
 
             <div>
-              {/* <div className="max-w-md mx-auto bg-white rounded-xl shadow-xl overflow-hidden md:max-w-2xl m-3">
-                <div className="md:flex">
-                  <div className="p-8">
-                    <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white uppercase tracking-wide font-semibold text-l text-center md:text-left px-5">
-                      Biggest Expenses:
-                    </div>
-                    <p className="mt-2 text-gray-500">
-                      {adviceData.most_spent_category}
-                    </p>
-                  </div>
-                  <div className="md:flex-shrink-0">
-                    {adviceData.most_spent_category === "food" && (
-                      <img
-                        className="h-48 w-full object-cover md:w-48 ms-20"
-                        src={grocerries}
-                        alt="grocerries"
-                      />
-                    )}
-                    {adviceData.most_spent_category === "clothing" && (
-                      <img
-                        className="h-48 w-full object-cover md:w-48 ms-20"
-                        src={clothing}
-                        alt="clothing"
-                      />
-                    )}
-                    {adviceData.most_spent_category === "cleaning" && (
-                      <img
-                        className="h-48 w-full object-cover md:w-48 ms-20"
-                        src={cleaning}
-                        alt="cleaning"
-                      />
-                    )}
-                    {adviceData.most_spent_category === "miscellaneous" && (
-                      <img
-                        className="h-48 w-full object-cover md:w-48 ms-20"
-                        src={miscellaneous}
-                        alt="miscellaneous"
-                      />
-                    )}
-                  </div>
-                </div>
-              </div> */}
               <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-5xl m-3">
                 <div className="md:flex md:items-center">
                   <div className="md:flex-shrink-0">
