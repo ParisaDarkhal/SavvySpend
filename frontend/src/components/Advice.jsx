@@ -24,7 +24,7 @@ function Advice() {
 
         const adviceArray = [];
         Object.entries(response.data.adviceData).forEach(([key, value]) => {
-          if (typeof value == "array") {
+          if (Array.isArray(value)) {
             for (let index = 0; index < value.length; index++) {
               adviceArray.push(`${value[i].key}: ${value[i].value}`);
             }
