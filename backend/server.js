@@ -61,7 +61,7 @@ const categorizeItems = async (text) => {
     messages: [
       {
         role: "user",
-        content: `I have this walmart receipt. I want you to show the date of receipt and also categorize the items in 3 categories: food, clothing, cleaning, miscellaneous. make sure to include the price of each item as well. make sure that the subtotal, tax and total should not be in any of the aforementioned categories. your response must be in markdown.\n\n${text}`,
+        content: `I have this walmart receipt. I want you to show the date of receipt and also categorize the items in 3 categories: food, clothing, cleaning, miscellaneous. make sure to include the price of each item as well but don't include currency . make sure that the subtotal, tax and total should not be in any of the aforementioned categories. your response must be in markdown.\n\n${text}`,
       },
     ],
     model: "gpt-3.5-turbo",
@@ -100,7 +100,7 @@ app.post("/save", async (req, res) => {
     const JsonReceipt = await convertToJson(receipt);
 
     // Extract date
-    const date = JsonReceipt["Date"];
+    const date = JsonReceipt["Date"] || null;
 
     // Define a function to insert items
     const insertItems = async (items, category) => {

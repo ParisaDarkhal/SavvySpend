@@ -22,7 +22,7 @@ Receipt.init(
     },
     date: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
     category: {
       type: DataTypes.STRING,
